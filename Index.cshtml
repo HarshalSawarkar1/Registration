@@ -1,0 +1,182 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script src="~/Content/Pages/Registration.js"></script>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        #imgPreview {
+            width: 100px;
+            height: auto;
+            margin-top: 10px;
+            display: none;
+        }
+
+        #ageContainer {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+    <div class="container mt-5">
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0 text-center">Registration Form</h3>
+            </div>
+            <form id="RegistrationForm" method="post" enctype="multipart/form-data">
+                <div class="card-body">
+                    <input type="hidden" name="Sr_No" id="hdnSr_No" />
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Name</label>
+                            <input type="text" id="txtName" class="form-control" placeholder="Your Name" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Email ID</label>
+                            <input type="email" id="txtEmail_Id" class="form-control" placeholder="Your Email" />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Address</label>
+                            <input type="text" id="txtAddress" class="form-control" placeholder="Your Address" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Mobile No</label>
+                            <input type="text" id="txtMobile_No" class="form-control" placeholder="10-digit Mobile Number" />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">DOB</label>
+                            <input type="date" id="txtDOB" class="form-control" onchange="calculateAge()" />
+                            <div id="ageContainer" style="display: none;">
+                                <small class="text-muted">Age: <span id="lblAge" class="fw-bold"></span></small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Pincode</label>
+                            <input type="text" id="txtPincode" class="form-control" placeholder="Your Pincode" />
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Photo</label>
+                            <input type="file" id="fileselect" name="fb" class="form-control" />
+                            <span id="lblFileName" class="text-muted"></span>
+                            <img id="imgPreview" src="" class="img-thumbnail" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Password</label>
+                            <input type="password" id="txtPassword" class="form-control" placeholder="Create Password" />
+                            <span id="togglePassword" style=" position: absolute; top: 80%; right: 25%; transform:translateY(-50%); cursor: pointer; font-size: 15px; color: #333;">
+                                👁️
+                            </span>
+                        </div>
+                    </div>
+                    <button type="button" id="btnsubmit" class="btn btn-success w-100" onclick="SaveRegistration()">Submit</button>
+                </div>
+
+            </form>
+        </div>
+
+        <div class="mt-5">
+            <h4>Submitted Records</h4>
+            <table id="Registration_Form" class="table table-bordered table-hover table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Sr_No</th>
+                        <th>Name</th>
+                        <th>Address</th>
+                        <th>Email_Id</th>
+                        <th>DOB</th>
+                        <th>Age</th>
+                        <th>Photo</th>
+                        <th>Mobile_No</th>
+                        <th>Pincode</th>
+                        <th>Password</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function calculateAge() {
+            var dob = $("#txtDOB").val();
+
+            if (!dob) {
+                $("#lblAge").text("");
+                $("#ageContainer").hide();
+                return;
+            }
+
+            var birthDate = new Date(dob);
+            var today = new Date();
+
+            var years = today.getFullYear() - birthDate.getFullYear();
+            var months = today.getMonth() - birthDate.getMonth();
+            var days = today.getDate() - birthDate.getDate();
+
+            if (days < 0) {
+                months--;
+                var preMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+                days += preMonth.getDate();
+            }
+
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+
+            var age = years + " years";
+            if (months > 0 || days > 0) {
+                age += " " + months + " months";
+            }
+
+            if (days > 0) {
+                age += " " + days + "days";
+            }
+
+            $("#lblAge").text(age);
+            $("#ageContainer").show();
+        }
+
+        // Preview image
+        document.getElementById('fileselect').addEventListener('change', function () {
+            const file = this.files[0];
+            if (file) {
+                document.getElementById('lblFileName').innerText = file.name;
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = document.getElementById('imgPreview');
+                    img.src = e.target.result;
+                    img.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        $(document).ready(function () {
+            $("#togglePassword").on('click', function () {
+                var input = $("#txtPassword");
+                var type = input.attr('type') === 'password' ? 'text' : 'password';
+                input.attr('type', type);
+            });
+        });
+    </script>
+
+</body>
+</html>
